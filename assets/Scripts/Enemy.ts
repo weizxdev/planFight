@@ -7,6 +7,7 @@ import {
   Sprite,
 } from "cc";
 import { Bullet } from "./Bullet";
+import { GameManager } from "./GameManager";
 const { ccclass, property } = _decorator;
 
 @ccclass("Enemy")
@@ -25,6 +26,9 @@ export class Enemy extends Component {
 
   @property
   down: string = "";
+
+  @property
+  socreNum: number = 100;
 
   collider: Collider2D = null;
 
@@ -67,6 +71,8 @@ export class Enemy extends Component {
     }
 
     if (this.hp <= 0) {
+      GameManager.getInstance().updateSocre(this.socreNum);
+
       if (this.collider) {
         this.collider.enabled = false;
       }

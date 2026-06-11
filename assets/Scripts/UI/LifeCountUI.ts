@@ -2,12 +2,12 @@ import { _decorator, Component, Label, Node } from "cc";
 import { GameManager } from "../GameManager";
 const { ccclass, property } = _decorator;
 
-@ccclass("BoomUI")
-export class BoomUI extends Component {
+@ccclass("LifeCountUI")
+export class LifeCountUI extends Component {
   @property(Label)
   numLabel: Label = null;
 
-  updateBoomUI(num: number) {
+  updateLifeCountUI(num: number) {
     this.numLabel.string = num.toString();
   }
 }

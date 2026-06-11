@@ -288,6 +288,7 @@
     "hp": 5,
     "hit": "Enemy2_Hit",
     "down": "Enemy2",
+    "socreNum": 300,
     "_id": ""
   },
   {

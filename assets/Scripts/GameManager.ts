@@ -1,5 +1,6 @@
 import { _decorator, Component, Node } from "cc";
 import { BoomUI } from "./UI/BoomUI";
+import { SocreUI } from "./UI/SocreUI";
 const { ccclass, property } = _decorator;
 
 @ccclass("GameManager")
@@ -15,6 +16,12 @@ export class GameManager extends Component {
   @property(BoomUI)
   boomUI: BoomUI = null;
 
+  @property(SocreUI)
+  socreUI: SocreUI = null;
+
+  @property
+  private socre: number = 0;
+
   protected onLoad(): void {
     GameManager.instance = this;
   }
@@ -26,5 +33,10 @@ export class GameManager extends Component {
 
   public getBoonNum(): number {
     return this.boomNum;
+  }
+
+  public updateSocre(num: number) {
+    this.socre += num;
+    this.socreUI.updateSocreUI(this.socre);
   }
 }

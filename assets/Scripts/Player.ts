@@ -15,6 +15,7 @@ import {
 } from "cc";
 import { Reward, RewardType } from "./Reward";
 import { GameManager } from "./GameManager";
+import { LifeCountUI } from "./UI/LifeCountUI";
 const { ccclass, property } = _decorator;
 
 enum ShootType {
@@ -70,6 +71,9 @@ export class Player extends Component {
   @property
   twoShootTime: number = 8;
 
+  @property(LifeCountUI)
+  lifeCountUI: LifeCountUI = null;
+
   shootTimer: number = 0;
   invoTimer: number = 0;
   twoShootTimer: number = 0;
@@ -81,6 +85,7 @@ export class Player extends Component {
   }
 
   protected start(): void {
+    this.changeLifeCOunt(0);
     // 注册单个碰撞体的回调函数
     this.collider = this.getComponent(Collider2D);
     if (this.collider) {
@@ -113,6 +118,11 @@ export class Player extends Component {
     if (this.collider) {
       this.collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
+  }
+
+  changeLifeCOunt(count: number) {
+    this.lifeCount += count;
+    this.lifeCountUI.updateLifeCountUI(this.lifeCount);
   }
 
   onBeginContact(_: Collider2D, otherCollider: Collider2D) {
@@ -158,7 +168,7 @@ export class Player extends Component {
 
     this.isInvo = true;
     this.invoTimer = 0;
-    this.lifeCount -= 1;
+    this.changeLifeCOunt(-1);
     if (this.lifeCount > 0) {
       this.animation.play(this.hit);
     } else {
