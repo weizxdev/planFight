@@ -58,10 +58,10 @@ export class Player extends Component {
   @property
   lifeCount: number = 3;
 
-  @property(String)
+  @property
   hit: string = "";
 
-  @property(String)
+  @property
   down: string = "";
 
   @property

@@ -20,10 +20,10 @@ export class Enemy extends Component {
   @property
   hp: number = 1;
 
-  @property(String)
+  @property
   hit: string = "";
 
-  @property(String)
+  @property
   down: string = "";
 
   collider: Collider2D = null;
