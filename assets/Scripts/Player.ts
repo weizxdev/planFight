@@ -79,6 +79,7 @@ export class Player extends Component {
   twoShootTimer: number = 0;
   isInvo: boolean = false;
   collider: Collider2D = null;
+  isCanControl: boolean = true;
 
   protected onLoad(): void {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
@@ -184,7 +185,7 @@ export class Player extends Component {
   }
 
   onTouchMove(evnet: EventTouch) {
-    if (this.lifeCount < 1) {
+    if (this.lifeCount < 1 || this.isCanControl == false) {
       return;
     }
     const pos = this.node.position;
@@ -232,5 +233,13 @@ export class Player extends Component {
     if (this.twoShootTimer > this.twoShootTime) {
       this.beginOneShoot();
     }
+  }
+
+  disableControl() {
+    this.isCanControl = false;
+  }
+
+  enableControl() {
+    this.isCanControl = true;
   }
 }
