@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from "cc";
+import { _decorator, Component, director, Node } from "cc";
 const { ccclass, property } = _decorator;
 
 @ccclass("StatGame")
@@ -7,5 +7,7 @@ export class StatGame extends Component {
 
   update(deltaTime: number) {}
 
-  startGame() {}
+  startGame() {
+    director.loadScene("Game");
+  }
 }
