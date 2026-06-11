@@ -10,5 +10,9 @@ export class Bullet extends Component {
     const pos = this.node.position;
     const s = this.speed * deltaTime;
     this.node.setPosition(pos.x, pos.y + s);
+
+    if (pos.y >= 440) {
+      this.node.destroy();
+    }
   }
 }
