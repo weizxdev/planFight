@@ -8,7 +8,7 @@ export class Bg extends Component {
   @property(Node)
   bg02: Node = null;
   @property
-  speed: number = 100;
+  speed: number = 150;
 
   start() {}
 
