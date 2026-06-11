@@ -5,8 +5,10 @@ const { ccclass, property } = _decorator;
 export class Bg extends Component {
   @property(Node)
   bg01: Node = null;
+
   @property(Node)
   bg02: Node = null;
+
   @property
   speed: number = 150;
 

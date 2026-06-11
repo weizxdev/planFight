@@ -1,38 +1,48 @@
 import {
   _decorator,
+  Animation,
+  Collider2D,
   Component,
+  Contact2DType,
   EventTouch,
   Input,
   input,
   instantiate,
   Node,
   Prefab,
+  Sprite,
   Vec3,
 } from "cc";
+import { Reward, RewardType } from "./Reward";
+import { GameManager } from "./GameManager";
 const { ccclass, property } = _decorator;
 
 enum ShootType {
   OneShoot,
   TwoShoot,
+  None,
 }
 
 @ccclass("Player")
 export class Player extends Component {
   @property
   shootRate: number = 0.3;
-  shootTimer: number = 0;
 
   @property(Prefab)
   bullet1Prefa: Prefab = null;
+
   @property(Prefab)
   bullet2Prefa: Prefab = null;
+
   @property(Prefab)
   bullet3Prefa: Prefab = null;
 
   @property(Node)
   bullet1Pos: Node = null;
+
   @property(Node)
   bullet2Pos: Node = null;
+
   @property(Node)
   bullet3Pos: Node = null;
 
@@ -42,8 +52,40 @@ export class Player extends Component {
   @property(typeof ShootType)
   shootType: ShootType = ShootType.OneShoot;
 
+  @property(Animation)
+  animation: Animation = null;
+
+  @property
+  lifeCount: number = 3;
+
+  @property(String)
+  hit: string = "";
+
+  @property(String)
+  down: string = "";
+
+  @property
+  invoRate: number = 0.3;
+
+  @property
+  twoShootTime: number = 8;
+
+  shootTimer: number = 0;
+  invoTimer: number = 0;
+  twoShootTimer: number = 0;
+  isInvo: boolean = false;
+  collider: Collider2D = null;
+
   protected onLoad(): void {
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
+  }
+
+  protected start(): void {
+    // 注册单个碰撞体的回调函数
+    this.collider = this.getComponent(Collider2D);
+    if (this.collider) {
+      this.collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    }
   }
 
   protected update(dt: number): void {
@@ -57,13 +99,84 @@ export class Player extends Component {
         this.twoShoot(dt);
         break;
     }
+
+    if (this.isInvo) {
+      this.invoTimer += dt;
+      if (this.invoTimer > this.invoRate) {
+        this.isInvo = false;
+      }
+    }
   }
 
   protected onDestroy(): void {
     input.off(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
+    if (this.collider) {
+      this.collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    }
+  }
+
+  onBeginContact(_: Collider2D, otherCollider: Collider2D) {
+    const reward = otherCollider.getComponent(Reward);
+    if (reward) {
+      this.onContactToReward(reward);
+    } else {
+      this.onContactToEnemy(otherCollider);
+    }
+  }
+
+  beginOneShoot() {
+    this.shootType = ShootType.OneShoot;
+  }
+
+  beginTwoShoot() {
+    this.twoShootTimer = 0;
+    this.shootType = ShootType.TwoShoot;
+  }
+
+  lastReward: Reward = null;
+  onContactToReward(reward: Reward) {
+    if (this.lastReward == reward) {
+      return;
+    }
+    this.lastReward = reward;
+    switch (reward.rewardType) {
+      case RewardType.TwoShoot:
+        this.beginTwoShoot();
+        break;
+      case RewardType.Boom:
+        GameManager.getInstance().addBoomNum();
+        break;
+    }
+    reward.getComponent(Sprite).enabled = false;
+    reward.getComponent(Collider2D).enabled = false;
+  }
+
+  onContactToEnemy(otherCollider: Collider2D) {
+    if (this.isInvo) {
+      return;
+    }
+
+    this.isInvo = true;
+    this.invoTimer = 0;
+    this.lifeCount -= 1;
+    if (this.lifeCount > 0) {
+      this.animation.play(this.hit);
+    } else {
+      this.animation.play(this.down);
+    }
+
+    if (this.lifeCount <= 0) {
+      this.shootType = ShootType.None;
+      if (this.collider) {
+        this.collider.enabled = false;
+      }
+    }
   }
 
   onTouchMove(evnet: EventTouch) {
+    if (this.lifeCount < 1) {
+      return;
+    }
     const pos = this.node.position;
     const x = evnet.getDeltaX();
     const y = evnet.getDeltaY();
@@ -103,6 +216,11 @@ export class Player extends Component {
       this.bulletParent.addChild(bullet3);
       bullet2.setWorldPosition(this.bullet2Pos.getWorldPosition());
       bullet3.setWorldPosition(this.bullet3Pos.getWorldPosition());
+    }
+
+    this.twoShootTimer += dt;
+    if (this.twoShootTimer > this.twoShootTime) {
+      this.beginOneShoot();
     }
   }
 }

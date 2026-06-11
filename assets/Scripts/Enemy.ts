@@ -4,13 +4,16 @@ import {
   Collider2D,
   Component,
   Contact2DType,
+  Sprite,
 } from "cc";
+import { Bullet } from "./Bullet";
 const { ccclass, property } = _decorator;
 
 @ccclass("Enemy")
 export class Enemy extends Component {
   @property
   speed: number = 300;
+
   @property(Animation)
   animation: Animation = null;
 
@@ -19,6 +22,7 @@ export class Enemy extends Component {
 
   @property(String)
   hit: string = "";
+
   @property(String)
   down: string = "";
 
@@ -51,9 +55,11 @@ export class Enemy extends Component {
   }
 
   onBeginContact(_: Collider2D, otherCollider: Collider2D) {
-    otherCollider.enabled = false;
+    if (otherCollider.getComponent(Bullet)) {
+      otherCollider.enabled = false;
+      otherCollider.getComponent(Sprite).enabled = false;
+    }
     this.hp -= 1;
-    this.animation.play();
     if (this.hp > 0) {
       this.animation.play(this.hit);
     } else {
