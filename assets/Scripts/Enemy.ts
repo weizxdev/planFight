@@ -8,6 +8,7 @@ import {
 } from "cc";
 import { Bullet } from "./Bullet";
 import { GameManager } from "./GameManager";
+import { EnemyManager } from "./EnemyManager";
 const { ccclass, property } = _decorator;
 
 @ccclass("Enemy")
@@ -56,6 +57,7 @@ export class Enemy extends Component {
     if (this.collider) {
       this.collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
+    EnemyManager.getInstance().removeEnemy(this.node);
   }
 
   onBeginContact(_: Collider2D, otherCollider: Collider2D) {
@@ -71,14 +73,31 @@ export class Enemy extends Component {
     }
 
     if (this.hp <= 0) {
-      GameManager.getInstance().updateSocre(this.socreNum);
-
-      if (this.collider) {
-        this.collider.enabled = false;
-      }
-      this.scheduleOnce(() => {
-        this.node.destroy();
-      }, 1);
+      this.dead();
     }
+  }
+
+  hasDead: boolean = false;
+  dead() {
+    if (this.hasDead) {
+      return;
+    }
+    GameManager.getInstance().updateSocre(this.socreNum);
+    if (this.collider) {
+      this.collider.enabled = false;
+    }
+    this.scheduleOnce(() => {
+      this.node.destroy();
+    }, 1);
+    this.hasDead = true;
+  }
+
+  killNow() {
+    if (this.hp <= 0) {
+      return;
+    }
+    this.hp = 0;
+    this.animation.play(this.down);
+    this.dead();
   }
 }

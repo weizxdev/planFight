@@ -155,7 +155,7 @@ export class Player extends Component {
         this.beginTwoShoot();
         break;
       case RewardType.Boom:
-        GameManager.getInstance().addBoomNum();
+        GameManager.getInstance().updateBoomNum(1);
         break;
     }
     reward.getComponent(Sprite).enabled = false;
@@ -181,6 +181,10 @@ export class Player extends Component {
       if (this.collider) {
         this.collider.enabled = false;
       }
+
+      this.scheduleOnce(() => {
+        GameManager.getInstance().gameOver();
+      }, 1);
     }
   }
 

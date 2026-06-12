@@ -1,8 +1,23 @@
-import { _decorator, Component, instantiate, math, Node, Prefab } from "cc";
+import {
+  _decorator,
+  Component,
+  director,
+  instantiate,
+  math,
+  Node,
+  Prefab,
+} from "cc";
+import { GameManager } from "./GameManager";
+import { Enemy } from "./Enemy";
 const { ccclass, property } = _decorator;
 
 @ccclass("EnemyManager")
 export class EnemyManager extends Component {
+  private static instance: EnemyManager;
+  public static getInstance(): EnemyManager {
+    return this.instance;
+  }
+
   @property
   enemy0SpawnRate: number = 1;
 
@@ -29,6 +44,13 @@ export class EnemyManager extends Component {
 
   @property(Prefab)
   reward2Prefab: Prefab = null;
+
+  @property([Node])
+  enemyList: Node[] = [];
+
+  protected onLoad(): void {
+    EnemyManager.instance = this;
+  }
 
   start() {
     this.schedule(this.enemy0Spawn, this.enemy0SpawnRate);
@@ -67,13 +89,41 @@ export class EnemyManager extends Component {
     } else {
       prefab = this.reward2Prefab;
     }
-    this.enemySpawn(prefab, -207, 207, 474);
+    this.enemySpawn(prefab, -207, 207, 474, true);
   }
 
-  enemySpawn(prefab: Prefab, minX: number, maxX: number, y: number) {
+  enemySpawn(
+    prefab: Prefab,
+    minX: number,
+    maxX: number,
+    y: number,
+    isReward = false,
+  ) {
     const enemy = instantiate(prefab);
+    if (!isReward) {
+      this.addEnemy(enemy);
+    }
     this.node.addChild(enemy);
     const x = math.randomRangeInt(minX, maxX);
     enemy.setPosition(x, y);
+  }
+
+  addEnemy(enemy: Node) {
+    this.enemyList.push(enemy);
+  }
+
+  removeEnemy(enemy: Node) {
+    const index = this.enemyList.indexOf(enemy);
+    if (index !== -1) {
+      this.enemyList.splice(index, 1);
+    }
+  }
+
+  destroyAllEnemy() {
+    GameManager.getInstance().updateBoomNum(-1);
+    for (const e of this.enemyList) {
+      const enemy = e.getComponent(Enemy);
+      enemy.killNow();
+    }
   }
 }
