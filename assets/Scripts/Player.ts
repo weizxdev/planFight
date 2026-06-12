@@ -12,7 +12,7 @@ import {
   Node,
   Prefab,
   Sprite,
-  Vec3,
+  Vec2,
 } from "cc";
 import { Reward, RewardType } from "./Reward";
 import { GameManager } from "./GameManager";
@@ -92,13 +92,19 @@ export class Player extends Component {
   collider: Collider2D = null;
   isCanControl: boolean = true;
 
+  // 修正为 Vec2，匹配 getUILocation 参数类型
+  private touchStartUI: Vec2 = new Vec2();
+  private currentTouchId: number = -1;
+
   protected onLoad(): void {
+    input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
     input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
+    input.on(Input.EventType.TOUCH_END, this.onTouchEnd, this);
+    input.on(Input.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
   }
 
   protected start(): void {
     this.changeLifeCOunt(0);
-    // 注册单个碰撞体的回调函数
     this.collider = this.getComponent(Collider2D);
     if (this.collider) {
       this.collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
@@ -126,7 +132,11 @@ export class Player extends Component {
   }
 
   protected onDestroy(): void {
+    input.off(Input.EventType.TOUCH_START, this.onTouchStart, this);
     input.off(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
+    input.off(Input.EventType.TOUCH_END, this.onTouchEnd, this);
+    input.off(Input.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
+
     if (this.collider) {
       this.collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
@@ -201,27 +211,44 @@ export class Player extends Component {
     }
   }
 
-  onTouchMove(evnet: EventTouch) {
-    if (this.lifeCount < 1 || this.isCanControl == false) {
-      return;
+  onTouchStart(event: EventTouch) {
+    if (this.lifeCount < 1 || !this.isCanControl) return;
+    if (this.currentTouchId !== -1) return;
+
+    this.currentTouchId = event.getID();
+    // 获取 UI 坐标系坐标（和设计分辨率一致，不受编辑器缩放影响）
+    event.getUILocation(this.touchStartUI);
+  }
+
+  onTouchMove(event: EventTouch) {
+    if (this.lifeCount < 1 || !this.isCanControl) return;
+    if (event.getID() !== this.currentTouchId) return;
+
+    const curUI = new Vec2();
+    event.getUILocation(curUI);
+
+    // 计算 UI 坐标偏移（和世界坐标 1:1 对应，不受显示比例影响）
+    const offsetX = curUI.x - this.touchStartUI.x;
+    const offsetY = curUI.y - this.touchStartUI.y;
+
+    let targetX = this.node.position.x + offsetX;
+    let targetY = this.node.position.y + offsetY;
+
+    // 完全保留你原始边界数值
+    if (targetX <= -230) targetX = -230;
+    if (targetX >= 230) targetX = 230;
+    if (targetY >= 380) targetY = 380;
+    if (targetY <= -380) targetY = -380;
+
+    this.node.setPosition(targetX, targetY);
+    // 每帧更新起点，消除累计偏移
+    this.touchStartUI.set(curUI);
+  }
+
+  onTouchEnd(event: EventTouch) {
+    if (event.getID() === this.currentTouchId) {
+      this.currentTouchId = -1;
     }
-    const pos = this.node.position;
-    const x = evnet.getDeltaX();
-    const y = evnet.getDeltaY();
-    let targetPos = new Vec3(pos.x + x, pos.y + y);
-    if (targetPos.x <= -230) {
-      targetPos.x = -230;
-    }
-    if (targetPos.x >= 230) {
-      targetPos.x = 230;
-    }
-    if (targetPos.y >= 380) {
-      targetPos.y = 380;
-    }
-    if (targetPos.y <= -380) {
-      targetPos.y = -380;
-    }
-    this.node.setPosition(targetPos);
   }
 
   oneShoot(dt: number) {
