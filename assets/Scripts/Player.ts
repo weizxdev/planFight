@@ -79,6 +79,12 @@ export class Player extends Component {
   @property(AudioClip)
   bulletAduio: AudioClip = null;
 
+  @property(AudioClip)
+  getBombAudio: AudioClip = null;
+
+  @property(AudioClip)
+  getDoubleShootAudio: AudioClip = null;
+
   shootTimer: number = 0;
   invoTimer: number = 0;
   twoShootTimer: number = 0;
@@ -157,9 +163,11 @@ export class Player extends Component {
     this.lastReward = reward;
     switch (reward.rewardType) {
       case RewardType.TwoShoot:
+        AudioMgr.inst.playOneShot(this.getDoubleShootAudio, 1);
         this.beginTwoShoot();
         break;
       case RewardType.Boom:
+        AudioMgr.inst.playOneShot(this.getBombAudio, 1);
         GameManager.getInstance().updateBoomNum(1);
         break;
     }

@@ -52,6 +52,12 @@ export class GameManager extends Component {
   @property(AudioClip)
   btnAudio: AudioClip = null;
 
+  @property(AudioClip)
+  gameOverAudio: AudioClip = null;
+
+  @property(AudioClip)
+  achievementAudio: AudioClip = null;
+
   protected onLoad(): void {
     GameManager.instance = this;
   }
@@ -97,11 +103,15 @@ export class GameManager extends Component {
   gameOver() {
     this.pauseGame();
     const key = "maxSocre";
+    AudioMgr.inst.playOneShot(this.gameOverAudio, 1);
     const maxSocreItem = localStorage.getItem(key);
     let maxSocre = Number(JSON.parse(maxSocreItem || "0") || 0);
     if (maxSocre < this.socre) {
       maxSocre = this.socre;
       localStorage.setItem(key, JSON.stringify(this.socre));
+      this.schedule(() => {
+        AudioMgr.inst.playOneShot(this.achievementAudio, 1);
+      }, 2);
     }
     this.gameOverUI.showGameOverUI(maxSocre, this.socre);
   }

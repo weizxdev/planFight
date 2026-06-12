@@ -1020,6 +1020,14 @@
       "__uuid__": "e741a637-b071-4f1a-ae1e-b2410bdbb59c",
       "__expectedType__": "cc.AudioClip"
     },
+    "getBombAudio": {
+      "__uuid__": "7554c59b-a824-4dec-adc1-96522969a949",
+      "__expectedType__": "cc.AudioClip"
+    },
+    "getDoubleShootAudio": {
+      "__uuid__": "48b966dd-d897-47df-8903-57d03b65c96f",
+      "__expectedType__": "cc.AudioClip"
+    },
     "_id": "a7NPr/s+NFOL0diE6sghvS"
   },
   {
@@ -2322,6 +2330,14 @@
     },
     "btnAudio": {
       "__uuid__": "755b8b35-c332-404c-9c3c-da18690c44bd",
+      "__expectedType__": "cc.AudioClip"
+    },
+    "gameOverAudio": {
+      "__uuid__": "69bce87d-b8d9-4eb4-8524-10bd1f3df6f4",
+      "__expectedType__": "cc.AudioClip"
+    },
+    "achievementAudio": {
+      "__uuid__": "fee26cf0-5e02-4aac-b033-c90f03fa309f",
       "__expectedType__": "cc.AudioClip"
     },
     "_id": "22+we2FltG/YWDjBpT9LDO"
@@ -4303,6 +4319,10 @@
       "__expectedType__": "cc.Prefab"
     },
     "enemyList": [],
+    "useBombAudio": {
+      "__uuid__": "d139218d-cceb-435b-8396-6a55131f22a8",
+      "__expectedType__": "cc.AudioClip"
+    },
     "_id": "f63ptAFwxAgIzld0YXx0eE"
   },
   {

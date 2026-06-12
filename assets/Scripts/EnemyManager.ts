@@ -1,5 +1,6 @@
 import {
   _decorator,
+  AudioClip,
   Component,
   director,
   instantiate,
@@ -9,6 +10,7 @@ import {
 } from "cc";
 import { GameManager } from "./GameManager";
 import { Enemy } from "./Enemy";
+import { AudioMgr } from "./AudioMgr";
 const { ccclass, property } = _decorator;
 
 @ccclass("EnemyManager")
@@ -47,6 +49,9 @@ export class EnemyManager extends Component {
 
   @property([Node])
   enemyList: Node[] = [];
+
+  @property(AudioClip)
+  useBombAudio: AudioClip = null;
 
   protected onLoad(): void {
     EnemyManager.instance = this;
@@ -120,6 +125,7 @@ export class EnemyManager extends Component {
   }
 
   destroyAllEnemy() {
+    AudioMgr.inst.playOneShot(this.useBombAudio);
     GameManager.getInstance().updateBoomNum(-1);
     for (const e of this.enemyList) {
       const enemy = e.getComponent(Enemy);
