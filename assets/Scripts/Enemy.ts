@@ -1,14 +1,18 @@
 import {
   _decorator,
   Animation,
+  AudioClip,
+  AudioSource,
   Collider2D,
   Component,
   Contact2DType,
+  director,
   Sprite,
 } from "cc";
 import { Bullet } from "./Bullet";
 import { GameManager } from "./GameManager";
 import { EnemyManager } from "./EnemyManager";
+import { AudioMgr } from "./AudioMgr";
 const { ccclass, property } = _decorator;
 
 @ccclass("Enemy")
@@ -31,7 +35,23 @@ export class Enemy extends Component {
   @property
   socreNum: number = 100;
 
+  @property(AudioClip)
+  enemyDownAudio: AudioClip = null;
+
   collider: Collider2D = null;
+  audioSource: AudioSource | null = null;
+
+  onLoad() {
+    // 获取自身 AudioSource
+    const audioSource = this.getComponent(AudioSource);
+    if (audioSource) {
+      this.audioSource = audioSource;
+      this.audioSource?.play();
+    }
+    // 注册 游戏暂停/恢复 全局事件
+    director.on("game_pause", this.onGamePause, this);
+    director.on("game_resume", this.onGameResume, this);
+  }
 
   protected start(): void {
     // 注册单个碰撞体的回调函数
@@ -58,6 +78,8 @@ export class Enemy extends Component {
       this.collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
     EnemyManager.getInstance().removeEnemy(this.node);
+    director.off("game_pause", this.onGamePause, this);
+    director.off("game_resume", this.onGameResume, this);
   }
 
   onBeginContact(_: Collider2D, otherCollider: Collider2D) {
@@ -82,6 +104,7 @@ export class Enemy extends Component {
     if (this.hasDead) {
       return;
     }
+    AudioMgr.inst.playOneShot(this.enemyDownAudio, 1);
     GameManager.getInstance().updateSocre(this.socreNum);
     if (this.collider) {
       this.collider.enabled = false;
@@ -99,5 +122,20 @@ export class Enemy extends Component {
     this.hp = 0;
     this.animation.play(this.down);
     this.dead();
+  }
+
+  onGamePause() {
+    console.log(1);
+
+    if (this.audioSource && this.audioSource.playing) {
+      this.audioSource.pause(); // 暂停音频（保留播放进度）
+    }
+  }
+  onGameResume() {
+    console.log(2);
+
+    if (this.audioSource && !this.audioSource.playing) {
+      this.audioSource.play(); // 继续播放
+    }
   }
 }

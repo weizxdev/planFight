@@ -289,6 +289,10 @@
     "hit": "Enemy1_Hit",
     "down": "Enemy1",
     "socreNum": 200,
+    "enemyDownAudio": {
+      "__uuid__": "b8c68f7f-c31e-42c1-bbea-828647e0c0be",
+      "__expectedType__": "cc.AudioClip"
+    },
     "_id": ""
   },
   {
@@ -419,7 +423,6 @@
       "__id__": 0
     },
     "fileId": "0aKT2Qx+5MF5yEWJUfNb58",
-    "instance": null,
     "targetOverrides": []
   }
 ]

@@ -1,8 +1,18 @@
-import { _decorator, Component, director, Node } from "cc";
+import {
+  _decorator,
+  AudioClip,
+  AudioSource,
+  Component,
+  director,
+  instantiate,
+  Node,
+  Prefab,
+} from "cc";
 import { BoomUI } from "./UI/BoomUI";
 import { SocreUI } from "./UI/SocreUI";
 import { Player } from "./Player";
 import { GameOverUI } from "./UI/GameOverUI";
+import { AudioMgr } from "./AudioMgr";
 const { ccclass, property } = _decorator;
 
 @ccclass("GameManager")
@@ -36,8 +46,18 @@ export class GameManager extends Component {
   @property(GameOverUI)
   gameOverUI: GameOverUI = null;
 
+  @property(AudioClip)
+  gameMusic: AudioClip = null;
+
+  @property(AudioClip)
+  btnAudio: AudioClip = null;
+
   protected onLoad(): void {
     GameManager.instance = this;
+  }
+
+  protected start(): void {
+    AudioMgr.inst.play(this.gameMusic, 0.2, true);
   }
 
   public updateBoomNum(num: number) {
@@ -59,6 +79,9 @@ export class GameManager extends Component {
     this.player.disableControl();
     this.pauseBtn.active = false;
     this.resumeBtn.active = true;
+    AudioMgr.inst.playOneShot(this.btnAudio, 1);
+    AudioMgr.inst.pause();
+    director.emit("game_pause");
   }
 
   resumeGame() {
@@ -66,6 +89,9 @@ export class GameManager extends Component {
     this.player.enableControl();
     this.pauseBtn.active = true;
     this.resumeBtn.active = false;
+    AudioMgr.inst.playOneShot(this.btnAudio, 1);
+    AudioMgr.inst.resume();
+    director.emit("game_resume");
   }
 
   gameOver() {

@@ -1016,6 +1016,10 @@
     "lifeCountUI": {
       "__id__": 29
     },
+    "bulletAduio": {
+      "__uuid__": "e741a637-b071-4f1a-ae1e-b2410bdbb59c",
+      "__expectedType__": "cc.AudioClip"
+    },
     "_id": "a7NPr/s+NFOL0diE6sghvS"
   },
   {
@@ -2311,6 +2315,14 @@
     },
     "gameOverUI": {
       "__id__": 67
+    },
+    "gameMusic": {
+      "__uuid__": "3ca2159e-3d72-43d3-9237-8d6e667e6d0a",
+      "__expectedType__": "cc.AudioClip"
+    },
+    "btnAudio": {
+      "__uuid__": "755b8b35-c332-404c-9c3c-da18690c44bd",
+      "__expectedType__": "cc.AudioClip"
     },
     "_id": "22+we2FltG/YWDjBpT9LDO"
   },

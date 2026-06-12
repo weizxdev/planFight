@@ -1,6 +1,7 @@
 import {
   _decorator,
   Animation,
+  AudioClip,
   Collider2D,
   Component,
   Contact2DType,
@@ -16,6 +17,7 @@ import {
 import { Reward, RewardType } from "./Reward";
 import { GameManager } from "./GameManager";
 import { LifeCountUI } from "./UI/LifeCountUI";
+import { AudioMgr } from "./AudioMgr";
 const { ccclass, property } = _decorator;
 
 enum ShootType {
@@ -73,6 +75,9 @@ export class Player extends Component {
 
   @property(LifeCountUI)
   lifeCountUI: LifeCountUI = null;
+
+  @property(AudioClip)
+  bulletAduio: AudioClip = null;
 
   shootTimer: number = 0;
   invoTimer: number = 0;
@@ -215,6 +220,7 @@ export class Player extends Component {
     this.shootTimer += dt;
     if (this.shootTimer > this.shootRate) {
       this.shootTimer = 0;
+      AudioMgr.inst.playOneShot(this.bulletAduio, 0.2);
       const bullet1 = instantiate(this.bullet1Prefa);
       this.bulletParent.addChild(bullet1);
       bullet1.setWorldPosition(this.bullet1Pos.getWorldPosition());
@@ -225,6 +231,7 @@ export class Player extends Component {
     this.shootTimer += dt;
     if (this.shootTimer > this.shootRate) {
       this.shootTimer = 0;
+      AudioMgr.inst.playOneShot(this.bulletAduio, 0.2);
       const bullet2 = instantiate(this.bullet2Prefa);
       const bullet3 = instantiate(this.bullet3Prefa);
       this.bulletParent.addChild(bullet2);
